@@ -51,9 +51,9 @@ def get_access_token_and_shares(init_data_line):
         "chr" : int(chr_value),
         "bot_key": "app_bot_1"
     }
-    print(payload)
+    # print(payload)
     response = requests.post(url, headers=headers, data=json.dumps(payload))
-    print(response)
+
     if response.status_code == 201:
         data = response.json()
         if 'access_token' in data:
@@ -306,6 +306,7 @@ def apply_energy_boost(access_token):
         return False
 
 while True:  # Loop ini akan terus berjalan sampai skrip dihentikan secara manual
+    print_welcome_message()
     for init_data_line, content_time_line in zip(init_data_lines, content_time_lines):
         content_id, time_stamp = content_time_line.strip().split('|')
         access_token, energy, boost_ready, energy_ready = get_access_token_and_shares(init_data_line.strip())  # Terima energy_boost
