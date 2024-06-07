@@ -6,6 +6,18 @@ import sys
 import os
 init(autoreset=True)
 
+def print_welcome_message():
+    print(r"""
+          
+█▀▀ █░█ ▄▀█ █░░ █ █▄▄ █ █▀▀
+█▄█ █▀█ █▀█ █▄▄ █ █▄█ █ ██▄
+          """)
+    print(Fore.GREEN + Style.BRIGHT + "Tapswap BOT")
+    print(Fore.GREEN + Style.BRIGHT + "Update Link: https://github.com/adearman/tapswap")
+    print(Fore.GREEN + Style.BRIGHT + "Free Konsultasi Join Telegram Channel: https://t.me/ghalibie\n")
+    print(Fore.GREEN + Style.BRIGHT + "Buy me a coffee :) 0823 2367 3487 GOPAY / DANA")
+
+
 with open('init_data.txt', 'r') as file:
     init_data_lines = file.readlines()
 
