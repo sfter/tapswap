@@ -29,17 +29,19 @@ def get_access_token_and_shares(init_data_line):
         "sec-ch-ua-mobile": "?0",
         "sec-ch-ua-platform": "Windows",
         "x-app": "tapswap_server",
-        "x-cv": "608",
+        "x-cv": "621",
         "x-bot": "no",
     }
-    # chr_value, actual_init_data = init_data_line.split('|')
+    chr_value, actual_init_data = init_data_line.split('|')
     payload = {
-        "init_data": init_data_line,
+        "init_data": actual_init_data,
         "referrer": "",
-        "bot_key": "app_bot_0"
+        "chr" : int(chr_value),
+        "bot_key": "app_bot_1"
     }
+    print(payload)
     response = requests.post(url, headers=headers, data=json.dumps(payload))
-    
+    print(response)
     if response.status_code == 201:
         data = response.json()
         if 'access_token' in data:
