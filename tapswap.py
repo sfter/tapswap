@@ -612,7 +612,8 @@ while True:  # Loop ini akan terus berjalan sampai skrip dihentikan secara manua
                             claim_league(access_token, id_liga)
 
                     if use_kyc == 'y':
-                        auto_kyc_binance(access_token)
+                        binance_id = str(random.randint(10000000, 99999999))
+                        auto_kyc_binance(access_token, "M34", binance_id)
 
         submit_taps(access_token, energy, boost_ready, energy_ready, str(content_id), timestamp, init_data_line)
         time.sleep(random.uniform(1.5, 3.0))  # Kirim energy_boost ke submit_taps
