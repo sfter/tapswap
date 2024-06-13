@@ -28,6 +28,12 @@ with open('init_data.txt', 'r') as file:
 
 # Fungsi untuk login dan mendapatkan token akses serta shares
 def get_access_token_and_shares(init_data_line):
+    try:
+        chr_value, actual_init_data = init_data_line.split('|')
+    except ValueError:
+        print("Format baris tidak valid: ", init_data_line)
+        return None, None, None, None
+
     url = "https://api.tapswap.ai/api/account/login"
     headers = {
         "Accept": "*/*",
@@ -44,32 +50,19 @@ def get_access_token_and_shares(init_data_line):
         "sec-ch-ua-mobile": "?0",
         "sec-ch-ua-platform": "Windows",
         "x-app": "tapswap_server",
-        "x-cv": "621",
+        "x-cv": "624",
         "x-bot": "no",
     }
-    # chr_value, actual_init_data = init_data_line.split('|')
-    payload = {
-        "init_data": init_data_line,
-        "referrer": "",
-        "bot_key": "app_bot_1"
-    }
-    response = requests.post(url, headers=headers, data=json.dumps(payload))
-    if response.status_code == 201:
-        data = response.json()
-        chq = data['chq']
-        chq_result = extract_chq(chq) 
-    else:
-        print(f"{Fore.RED+Style.BRIGHT}Error: {response.status_code}")
-        return None, None, None, None
-    payload = {
-        "init_data": init_data_line,
-        "referrer": "",
-        "chr": int(chq_result),
-        "bot_key": "app_bot_1"
-    }
-    response = requests.post(url, headers=headers, data=json.dumps(payload))
-    if response.status_code == 201:
 
+    payload = {
+        "init_data": actual_init_data,
+        "referrer": "",
+        "chr" : int(chr_value),
+        "bot_key": "app_bot_0"
+    }
+    # print(payload)
+    response = requests.post(url, headers=headers, data=json.dumps(payload))
+    if response.status_code == 201:
         data = response.json()
         if 'access_token' in data:
             access_token = data['access_token']
@@ -125,7 +118,7 @@ def apply_turbo_boost(access_token):
             "sec-ch-ua-mobile": "?0",
             "sec-ch-ua-platform": "Windows",
             "x-app": "tapswap_server",
-            "x-cv": "608",
+            "x-cv": "624",
             "x-bot": "no",
             # "Content-Id": content_id
         }
@@ -147,50 +140,7 @@ def apply_turbo_boost(access_token):
         print(f"\r{Fore.GREEN+Style.BRIGHT}Turbo aktif")
         return True
 
-def extract_chq(chq: str) -> int:
-    chq_length = len(chq)
-    bytes_array = bytearray(chq_length // 2)
-    xor_key = 157
 
-    for i in range(0, chq_length, 2):
-        bytes_array[i // 2] = int(chq[i:i + 2], 16)
-
-    xor_bytes = bytearray(t ^ xor_key for t in bytes_array)
-    decoded_xor = xor_bytes.decode('unicode_escape')
-
-    html = re.search(r'innerHTML.+?=(.+?);', decoded_xor, re.DOTALL | re.I | re.M).group(1).strip()
-    html = re.sub(r"\'\+\'", "", html, flags=re.M | re.I)
-    soup = BeautifulSoup(html, 'html.parser')
-
-    div_elements = soup.find_all('div')
-    codes = {}
-    for div in div_elements:
-        if 'id' in div.attrs and '_v' in div.attrs:
-            codes[div['id']] = div['_v']
-
-    va = re.search(r'''var(?:\s+)?i(?:\s+)?=.+?\([\'\"](\w+)[\'\"]\).+?,''', decoded_xor, flags=re.M | re.I).group(1)
-    vb = re.search(r'''\,(?:\s+)?j(?:\s+)?=.+?\([\'\"](\w+)[\'\"]\).+?,''', decoded_xor, flags=re.M | re.I).group(1)
-    r = re.search(r'''k(?:\s+)?%=(?:\s+)?(\w+)''', decoded_xor, flags=re.M | re.I).group(1)
-
-    i = int(codes[va])
-    j = int(codes[vb])
-    k = int(i)
-
-    k *= k
-    k *= j
-    k %= int(r, 16)
-
-    return k
-
-def get_access_token_and_profile_data(tg_web_data):
-    response = requests.post('https://api.tapswap.ai/api/account/login', json={"init_data": tg_web_data, "referrer": ""})
-    response.raise_for_status()
-    response_json = response.json()
-    chq = response_json.get('chq')
-
-    if chq:
-        chq_result = extract_chq(chq=chq)
-        return chq_result
 
 # Fungsi untuk mengirim taps
 def upgrade_level(headers, upgrade_type):
@@ -294,7 +244,7 @@ def submit_taps(access_token, energy, boost_ready, energy_ready, content_id, tim
             "sec-ch-ua-platform": "Windows",
             "x-app": "tapswap_server",
             "x-bot": "no",
-            "x-cv": "608",
+            "x-cv": "624",
         }
 
         if turbo_activated == True:
@@ -389,7 +339,7 @@ def join_mission(access_token, mission_id):
             "sec-ch-ua-mobile": "?0",
             "sec-ch-ua-platform": "Windows",
             "x-app": "tapswap_server",
-            "x-cv": "608",
+            "x-cv": "624",
             "x-bot": "no",
             # "Content-Id": content_id
         }
@@ -428,7 +378,7 @@ def finish_mission_item(access_token, mission_id, item_index, user_input=None):
             "sec-ch-ua-mobile": "?0",
             "sec-ch-ua-platform": "Windows",
             "x-app": "tapswap_server",
-            "x-cv": "608",
+            "x-cv": "624",
             "x-bot": "no",
             # "Content-Id": content_id
         }
@@ -473,7 +423,7 @@ def finish_mission(access_token, mission_id):
             "sec-ch-ua-mobile": "?0",
             "sec-ch-ua-platform": "Windows",
             "x-app": "tapswap_server",
-            "x-cv": "608",
+            "x-cv": "624",
             "x-bot": "no",
             # "Content-Id": content_id
         }
@@ -508,7 +458,7 @@ def claim_reward(access_token, task_id):
             "sec-ch-ua-mobile": "?0",
             "sec-ch-ua-platform": "Windows",
             "x-app": "tapswap_server",
-            "x-cv": "608",
+            "x-cv": "624",
             "x-bot": "no",
             # "Content-Id": content_id
         }
@@ -563,7 +513,7 @@ def apply_energy_boost(access_token, content_id, timestamp):
             "sec-ch-ua-mobile": "?0",
             "sec-ch-ua-platform": "Windows",
             "x-app": "tapswap_server",
-            "x-cv": "608",
+            "x-cv": "624",
             "x-bot": "no",
         }
 
@@ -585,7 +535,7 @@ while True:  # Loop ini akan terus berjalan sampai skrip dihentikan secara manua
         init_data_line = init_data_line.strip()
         query_params = urllib.parse.parse_qs(init_data_line)
         user_data = query_params.get('user', [None])[0]
-        # access_token, energy, boost_ready, energy_ready = get_access_token_and_shares(init_data_line.strip())  # Terima energy_boost
+        #access_token, energy, boost_ready, energy_ready = get_access_token_and_shares(init_data_line.strip())  # Terima energy_boost
         if user_data:
                 user_data_json = json.loads(urllib.parse.unquote(user_data))
                 user_id = user_data_json.get('id')
