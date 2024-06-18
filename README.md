@@ -4,7 +4,6 @@ Auto Tap Tapswap Bot
 
 Join Here : [TapswapBot](https://t.me/tapswap_bot?start=r_968480911)
 
-## CHR | QUERY FORMAT INIT DATANYA. BALIK CHR LAGI
 
 ## Installation
 
@@ -24,7 +23,7 @@ Install with python
 ## Features
 - Auto KYC Binance
 - Auto Claim League
-- Auto CHR & Content ID
+- Auto Content ID
 - Auto Use Booster Energy
 - Auto Use Booster Tap
 - Auto Tap 10000 Times jika boost
