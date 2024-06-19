@@ -186,6 +186,14 @@ else:
     print("Input tidak valid. Harus 'Y' atau 'N'.")
     sys.exit()
 
+# Tambahkan input untuk auto clear task
+auto_clear = input("Auto clear task? (Y/N): ").strip().lower()
+if auto_clear in ['y', 'n', '']:
+    auto_clear = auto_clear or 'n'
+else:
+    print("Input tidak valid. Harus 'Y' atau 'N'.")
+    sys.exit()
+
 auto_claim_league = input("Auto Claim League? (Y/N): ").strip().lower()
 if auto_claim_league in ['y', 'n', '']:
     auto_claim_league = auto_claim_league or 'n'
@@ -272,13 +280,15 @@ def submit_taps(access_token, energy, boost_ready, energy_ready, content_id, tim
             if response.status_code == 201:
                 print(f"\r{Fore.GREEN+Style.BRIGHT}[ Tap ] : Tapped            ", flush=True)
                 tap_count += 1
+                max_upgrade += 1
                 if tap_count == 20:
                     print(f"\r{Fore.YELLOW+Style.BRIGHT}[ Tap ] : Tapped 20x, ganti akun", flush=True)
                     return
                 if use_upgrade == 'y' :
                     # upgrade_level(headers, "tap")
                     # upgrade_level(headers, "energy")
-                    upgrade_level(headers, "charge")
+                    if max_upgrade < 6:
+                        upgrade_level(headers, "charge")
                 cek_energy = response.json().get("player").get("energy")
                 if cek_energy < 50:
                     if use_booster == 'y':
@@ -292,6 +302,8 @@ def submit_taps(access_token, energy, boost_ready, energy_ready, content_id, tim
                 print(f"\n\r{Fore.RED+Style.BRIGHT}Gagal mengirim taps, status code: {response.text}")
                 print(f"\r{Fore.RED+Style.BRIGHT}Beralih ke akun selanjutnya", end='', flush=True)
                 return
+            
+            
 def claim_league(access_token, league_id):
     url = "https://api.tapswap.ai/api/player/claim_reward"
     headers = {
@@ -326,6 +338,8 @@ def claim_league(access_token, league_id):
             return False
         print(f"{Fore.RED+Style.BRIGHT}\r[ League {league_id} ] : Gagal klaim liga, status code: {response.text}", flush=True)
         return False
+
+ 
 #Fungsi untuk join mission
 def join_mission(access_token, mission_id):
     url = "https://api.tapswap.ai/api/missions/join_mission"
@@ -358,12 +372,40 @@ def join_mission(access_token, mission_id):
         response = response.json()
         if response.get("message") == "mission_already_completed":
             print(f"{Fore.GREEN+Style.BRIGHT}\r[ KYC ] : Sudah KYC", flush=True)
+            claim_reward(access_token, mission_id)
             return False
         elif response.get("message") == "mission_already_joined":
             print(f"{Fore.GREEN+Style.BRIGHT}\r[ KYC ] : Proses KYC", flush=True)
             return True
         print(f"{Fore.RED+Style.BRIGHT}\r[ KYC ] : Gagal mengaktifkan {mission_id}, status code: {response.text}", flush=True)
         return False
+def auto_clear_task(access_token, mission_id):
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Accept": "*/*",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Content-Type": "application/json",
+        "Connection": "keep-alive",
+        "Origin": "https://app.tapswap.club",
+        "Referer": "https://app.tapswap.club/",
+        "Sec-Fetch-Dest": "empty",
+        "Sec-Fetch-Mode": "cors",
+        "Sec-Fetch-Site": "cross-site",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+        "sec-ch-ua": '"Microsoft Edge";v="125", "Chromium";v="125", "Not.A/Brand";v="24", "Microsoft Edge WebView2";v="125"',
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": "Windows",
+        "x-app": "tapswap_server",
+        "x-cv": "629"
+    }
+    for _ in range(2):  # Ulangi 2 kali
+        for item_index in range(3):  # Untuk index 0, 1, 2
+            payload = {"id": mission_id, "itemIndex": item_index}
+            response = requests.post("https://api.tapswap.ai/api/missions/finish_mission_item", headers=headers, json=payload)
+            if response.status_code == 201:
+                print(f"{Fore.GREEN+Style.BRIGHT}\r[ Task ] Item {item_index} misi {mission_id} berhasil diselesaikan.", flush=True)
+            else:
+                print(f"{Fore.RED+Style.BRIGHT}\r[ Task ] Gagal menyelesaikan item {item_index} misi {mission_id}, status code: {response.status_code}", flush=True)
 
 # Fungsi untuk menyelesaikan item misi
 def finish_mission_item(access_token, mission_id, item_index, user_input=None):
@@ -557,11 +599,11 @@ while True:  # Loop ini akan terus berjalan sampai skrip dihentikan secara manua
                         print(f"\r{Fore.RED+Style.BRIGHT}Token akses tidak valid, lanjut ke akun berikutnya.", flush=True)
                         continue
 
-                    if use_upgrade == 'y':
-                        if random.random() < 0.5:
-                            upgrade_level(headers={"Authorization": f"Bearer {access_token}"}, upgrade_type="energy")
-                        else:
-                            upgrade_level(headers={"Authorization": f"Bearer {access_token}"}, upgrade_type="tap")
+                    # if use_upgrade == 'y':
+                    #     if random.random() < 0.5:
+                    #         upgrade_level(headers={"Authorization": f"Bearer {access_token}"}, upgrade_type="energy")
+                    #     else:
+                    #         upgrade_level(headers={"Authorization": f"Bearer {access_token}"}, upgrade_type="tap")
 
                     if auto_claim_league == 'y':
                         for id_liga in range(1, 9):
@@ -570,6 +612,11 @@ while True:  # Loop ini akan terus berjalan sampai skrip dihentikan secara manua
                     if use_kyc == 'y':
                         binance_id = str(random.randint(10000000, 99999999))
                         auto_kyc_binance(access_token, "M34", binance_id)
+                    
+                    if auto_clear == 'y':
+                        mission_id = "M0"  # Ganti dengan ID misi yang valid
+                        auto_clear_task(access_token, mission_id)
+                        claim_reward(access_token, mission_id)
 
         submit_taps(access_token, energy, boost_ready, energy_ready, str(content_id), timestamp, init_data_line)
         time.sleep(random.uniform(1.5, 3.0))  # Kirim energy_boost ke submit_taps
