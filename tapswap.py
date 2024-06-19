@@ -205,7 +205,7 @@ else:
 def submit_taps(access_token, energy, boost_ready, energy_ready, content_id, time_stamp, init_data_line):
     global turbo_activated
     tap_count = 0
-
+    max_upgrade = 0 
     while True:
         url = "https://api.tapswap.ai/api/player/submit_taps"
 
@@ -280,11 +280,12 @@ def submit_taps(access_token, energy, boost_ready, energy_ready, content_id, tim
             if response.status_code == 201:
                 print(f"\r{Fore.GREEN+Style.BRIGHT}[ Tap ] : Tapped            ", flush=True)
                 tap_count += 1
-                max_upgrade += 1
+                
                 if tap_count == 20:
                     print(f"\r{Fore.YELLOW+Style.BRIGHT}[ Tap ] : Tapped 20x, ganti akun", flush=True)
                     return
                 if use_upgrade == 'y' :
+                    max_upgrade += 1
                     # upgrade_level(headers, "tap")
                     # upgrade_level(headers, "energy")
                     if max_upgrade < 6:
