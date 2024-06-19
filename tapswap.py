@@ -8,7 +8,7 @@ init(autoreset=True)
 import random
 import requests
 import re
-# from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup
 
 def print_welcome_message():
     print(r"""
@@ -29,7 +29,7 @@ with open('init_data.txt', 'r') as file:
 # Fungsi untuk login dan mendapatkan token akses serta shares
 def get_access_token_and_shares(init_data_line):
     try:
-        actual_init_data = init_data_line
+        chr_value, actual_init_data = init_data_line.split('|')
     except ValueError:
         print("Format baris tidak valid: ", init_data_line)
         return None, None, None, None
@@ -57,10 +57,11 @@ def get_access_token_and_shares(init_data_line):
     payload = {
         "init_data": actual_init_data,
         "referrer": "",
+        "chr" : int(chr_value),
         "bot_key": "app_bot_0"
     }
     # print(payload)
-    response = requests.post(url, headers=headers, data=json.dumps(payload, separators=(",", ":")))
+    response = requests.post(url, headers=headers, data=json.dumps(payload))
     if response.status_code == 201:
         data = response.json()
         if 'access_token' in data:
