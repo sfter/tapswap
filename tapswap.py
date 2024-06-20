@@ -26,32 +26,35 @@ def print_welcome_message():
 with open('init_data.txt', 'r') as file:
     init_data_lines = file.readlines()
 
+
 # Fungsi untuk login dan mendapatkan token akses serta shares
 def get_access_token_and_shares(init_data_line):
     try:
-        chr_value, actual_init_data = init_data_line.split('|')
+        cache_id, chr_value, actual_init_data = init_data_line.split('|')
     except ValueError:
-        print("Format baris tidak valid: ", init_data_line)
+        print("Format baris tidak valid: CACHE_ID | CHR_VALUE | INIT_DATA ")
         return None, None, None, None
 
     url = "https://api.tapswap.ai/api/account/login"
     headers = {
-        "Accept": "*/*",
-        "Accept-Language": "en-US,en;q=0.9",
-        "Content-Type": "application/json",
-        "Connection": "keep-alive",
-        "Origin": "https://app.tapswap.club",
-        "Referer": "https://app.tapswap.club/",
-        "Sec-Fetch-Dest": "empty",
-        "Sec-Fetch-Mode": "cors",
-        "Sec-Fetch-Site": "cross-site",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-        "sec-ch-ua": '"Google Chrome";v="125", "Chromium";v="125", "Not.A/Brand";v="24"',
-        "sec-ch-ua-mobile": "?0",
-        "sec-ch-ua-platform": "Windows",
-        "x-app": "tapswap_server",
-        "x-cv": "629",
-        "x-bot": "no",
+        'Accept': '*/*',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Cache-Control': 'no-cache',
+        'Cache-Id': cache_id,
+        'Connection': 'keep-alive',
+        'Content-Type': 'application/json',
+        'Origin': 'https://app.tapswap.club',
+        'Pragma': 'no-cache',
+        'Referer': 'https://app.tapswap.club/',
+        'Sec-Fetch-Dest': 'empty',
+        'Sec-Fetch-Mode': 'cors',
+        'Sec-Fetch-Site': 'cross-site',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0',
+        'sec-ch-ua': '"Not/A)Brand";v="8", "Chromium";v="126", "Microsoft Edge";v="126", "Microsoft Edge WebView2";v="126"',
+        'sec-ch-ua-mobile': '?0',
+        'sec-ch-ua-platform': '"Windows"',
+        'x-app': 'tapswap_server',
+        'x-cv': '629'
     }
 
     payload = {
@@ -61,6 +64,7 @@ def get_access_token_and_shares(init_data_line):
         "bot_key": "app_bot_0"
     }
     # print(payload)
+    # print(headers)
     response = requests.post(url, headers=headers, data=json.dumps(payload))
     if response.status_code == 201:
         data = response.json()
@@ -257,10 +261,10 @@ def submit_taps(access_token, energy, boost_ready, energy_ready, content_id, tim
         }
 
         if turbo_activated == True:
-            total_taps = random.randint(20, 30)
+            total_taps = random.randint(50, 80)
             payload = {"taps": total_taps, "time": int(time_stamp)}
         else:
-            total_taps = random.randint(20, 30)
+            total_taps = random.randint(30, 40)
             payload = {"taps": total_taps, "time": int(time_stamp)}
 
        
